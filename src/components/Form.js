@@ -1,21 +1,53 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
 
-export default function Form() {
+
+function Form({ onAddItem, editingItem, setEditingItem, onEditItem }) {
+  const [cost, setCost] = useState('');
+  const [itemName, setItemName] = useState('');
+
+  useEffect(() => {
+    if (editingItem) {
+      setItemName(editingItem.name);
+      setCost(editingItem.cost.toString());
+    }
+  }, [editingItem]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!itemName || !cost) return;
+
+    if (editingItem) {
+      // 편집 로직을 처리합니다.
+      onEditItem(editingItem.id, itemName, parseFloat(cost));
+      setEditingItem(null);
+    } else {
+      // 새 항목 추가 로직을 처리합니다.
+      onAddItem(itemName, parseFloat(cost));
+    }
+    setItemName('');
+    setCost('');
+  };
+
   return (
-    <>
-    <div className="flex justify-stretch gap-10">
-    <div className="지출항목">
-        <div className="text-green-500 font-semibold ">지출항목</div>
-        <input type="text" name="item" placeholder="예) 렌트비"
-        className="border-0 border-b-2 border-solid border-green-100"/>
-    </div>
-    <div className="비용">
-    <div className="text-green-500 font-semibold">비용</div>
-    <input type="text" name="price" placeholder="0"
-    className="border-0 border-b-2 border-solid border-green-100"/>
-    </div>
-    </div>
-    <button className="p-2 mt-2 bg-green-500 flex text-white font-semibold gap-5">제출 <img className="w-5"src="https://www.svgrepo.com/show/201996/paper-plane.svg"/></button>
-    </>
-  )
+    <form onSubmit={handleSubmit} className="mb-4">
+      <input
+        type="text"
+        value={itemName}
+        onChange={(e) => setItemName(e.target.value)}
+        placeholder="지출 항목"
+        className="border p-2 mr-2"
+      />
+      <input
+        type="number"
+        value={cost}
+        onChange={(e) => setCost(e.target.value)}
+        placeholder="비용"
+        className="border p-2"
+      />
+      <button type="submit" className="bg-green-500 text-white px-4 py-2">
+        제출
+      </button>
+    </form>
+  );
 }
+export default Form;
